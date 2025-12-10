@@ -2,10 +2,16 @@
 
 import Stripe from 'stripe';
 
-// Initialize Stripe with secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2025-11-17.clover',
-});
+// Initialize Stripe with secret key (lazy initialization to avoid build errors)
+const getStripe = () => {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    if (!secretKey) {
+        throw new Error('STRIPE_SECRET_KEY is not configured. Please add it to your environment variables.');
+    }
+    return new Stripe(secretKey, {
+        apiVersion: '2025-11-17.clover',
+    });
+};
 
 export interface CreateCheckoutSessionParams {
     jobId: string;
@@ -40,7 +46,7 @@ export async function createCheckoutSession(params: CreateCheckoutSessionParams)
     } = params;
 
     try {
-        const session = await stripe.checkout.sessions.create({
+        const session = await getStripe().checkout.sessions.create({
             payment_method_types: ['card'],
             mode: 'payment',
             customer_email: customerEmail,
@@ -77,7 +83,7 @@ export async function createCheckoutSession(params: CreateCheckoutSessionParams)
  */
 export async function getCheckoutSession(sessionId: string) {
     try {
-        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        const session = await getStripe().checkout.sessions.retrieve(sessionId);
         return {
             id: session.id,
             paymentStatus: session.payment_status,
@@ -97,7 +103,7 @@ export async function getCheckoutSession(sessionId: string) {
  */
 export async function createPaymentIntent(amount: number, currency: string = 'eur', metadata?: Record<string, string>) {
     try {
-        const paymentIntent = await stripe.paymentIntents.create({
+        const paymentIntent = await getStripe().paymentIntents.create({
             amount,
             currency,
             metadata,
@@ -121,7 +127,7 @@ export async function createPaymentIntent(amount: number, currency: string = 'eu
  */
 export async function createRefund(paymentIntentId: string, amount?: number) {
     try {
-        const refund = await stripe.refunds.create({
+        const refund = await getStripe().refunds.create({
             payment_intent: paymentIntentId,
             amount: amount, // If undefined, refunds the entire amount
         });
