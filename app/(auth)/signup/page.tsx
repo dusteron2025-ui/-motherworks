@@ -86,12 +86,14 @@ export default function SignupPage() {
     };
 
     const getStepNumber = (): number => {
-        const steps: Step[] = ['role', 'credentials', 'phone', 'otp', 'address', 'profile', 'success'];
+        // TEMP: Skip phone and otp steps
+        const steps: Step[] = ['role', 'credentials', 'address', 'profile', 'success'];
         return steps.indexOf(step) + 1;
     };
 
     const getTotalSteps = (): number => {
-        return role === 'PROVIDER' ? 6 : 5;
+        // TEMP: Reduced steps without phone verification
+        return role === 'PROVIDER' ? 4 : 3;
     };
 
     // Send OTP
@@ -240,7 +242,8 @@ export default function SignupPage() {
                 setStep('credentials');
                 break;
             case 'credentials':
-                setStep('phone');
+                // TEMP: Skip phone verification - go directly to address
+                setStep('address');
                 break;
             case 'phone':
                 sendOTP();
@@ -270,7 +273,8 @@ export default function SignupPage() {
                 setStep('phone');
                 break;
             case 'address':
-                setStep('phone');
+                // TEMP: Skip phone verification - go back to credentials
+                setStep('credentials');
                 break;
             case 'profile':
                 setStep('address');
