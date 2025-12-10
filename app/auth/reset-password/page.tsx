@@ -1,26 +1,36 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, Eye, EyeOff, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { supabase } from '@/lib/supabase';
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
     const router = useRouter();
-    const { updatePassword, session } = useSupabaseAuth();
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [error, setError] = useState('');
+    const [hasValidSession, setHasValidSession] = useState<boolean | null>(null);
 
     // Check if user has a valid reset session
-    const hasValidSession = !!session;
+    useEffect(() => {
+        const checkSession = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                setHasValidSession(!!session);
+            } catch (err) {
+                setHasValidSession(false);
+            }
+        };
+        checkSession();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,7 +49,7 @@ export default function ResetPasswordPage() {
         setIsLoading(true);
 
         try {
-            const { error } = await updatePassword(password);
+            const { error } = await supabase.auth.updateUser({ password });
             if (error) {
                 setError(error.message);
             } else {
@@ -51,6 +61,15 @@ export default function ResetPasswordPage() {
             setIsLoading(false);
         }
     };
+
+    // Loading state while checking session
+    if (hasValidSession === null) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+                <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+            </div>
+        );
+    }
 
     if (isSuccess) {
         return (
@@ -170,5 +189,18 @@ export default function ResetPasswordPage() {
                 </CardContent>
             </Card>
         </div>
+    );
+}
+
+// Main page component with Suspense wrapper
+export default function ResetPasswordPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+                <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+            </div>
+        }>
+            <ResetPasswordForm />
+        </Suspense>
     );
 }
