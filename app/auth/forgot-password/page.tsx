@@ -8,11 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Mail, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { supabase } from '@/lib/supabase';
 
 export default function ForgotPasswordPage() {
     const router = useRouter();
-    const { resetPassword } = useSupabaseAuth();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -24,7 +23,9 @@ export default function ForgotPasswordPage() {
         setIsLoading(true);
 
         try {
-            const { error } = await resetPassword(email);
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/auth/reset-password`,
+            });
             if (error) {
                 setError(error.message);
             } else {
