@@ -13,7 +13,9 @@ import Link from "next/link";
 
 export default function ProviderDashboard() {
     const { user } = useAuth();
-    const { jobs, updateJobStatus } = useStore();
+    const store = useStore();
+    const jobs = store?.jobs || [];
+    const updateJobStatus = store?.updateJobStatus;
 
     if (!user || user.role !== 'PROVIDER') return null;
 
