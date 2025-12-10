@@ -163,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 };
                 setUser(userObj);
 
-                if (userObj.role === 'PROVIDER') router.push('/provider/onboarding');
+                if (userObj.role === 'PROVIDER') router.push('/provider');
                 else router.push('/client');
             }
         } catch (error) {
