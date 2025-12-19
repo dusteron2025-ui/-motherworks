@@ -22,14 +22,16 @@ const DEMO_USERS = [
 const DEFAULT_PASSWORD = 'Teste123!';
 
 export async function GET(request: NextRequest) {
-    // Verificar se é ambiente de desenvolvimento ou tem chave secreta
-    const url = new URL(request.url);
-    const secret = url.searchParams.get('secret');
+    // Usar nextUrl para maior compatibilidade no Next.js
+    const secret = request.nextUrl.searchParams.get('secret');
 
-    // Apenas permitir com chave secreta para segurança
-    if (secret !== 'mw-seed-2024') {
+    // Apenas permitir com chave secreta para segurança (com trim para evitar espaços)
+    if (secret?.trim() !== 'mw-seed-2024') {
         return NextResponse.json(
-            { error: 'Acesso não autorizado. Use ?secret=mw-seed-2024' },
+            {
+                error: 'Acesso não autorizado',
+                hint: 'Certifique-se de que a URL termina exatamente com ?secret=mw-seed-2024'
+            },
             { status: 401 }
         );
     }
