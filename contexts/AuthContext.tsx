@@ -128,6 +128,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const signup = async (data: Partial<User> & { password: string } & Record<string, unknown>) => {
         setIsLoading(true);
         try {
+            // Validações locais
+            if (!data.email || !data.email.includes('@')) {
+                throw new Error('Por favor, insira um email válido.');
+            }
+            if (!data.password || data.password.length < 6) {
+                throw new Error('A senha deve ter pelo menos 6 caracteres.');
+            }
+
             const { data: authData, error } = await supabase.auth.signUp({
                 email: data.email || '',
                 password: data.password,
@@ -140,12 +148,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
 
             if (error) {
+                // Traduzir erros comuns do Supabase
+                if (error.message.includes('already registered')) {
+                    throw new Error('Este email já está cadastrado. Tente fazer login.');
+                }
+                if (error.message.includes('invalid email')) {
+                    throw new Error('Email inválido. Verifique o formato.');
+                }
+                if (error.message.includes('weak password') || error.message.includes('password')) {
+                    throw new Error('Senha muito fraca. Use pelo menos 6 caracteres.');
+                }
                 throw new Error(error.message);
             }
 
             if (authData.user) {
                 // Create profile in profiles table
-                await supabase.from('profiles').upsert({
+                const { error: profileError } = await supabase.from('profiles').upsert({
                     id: authData.user.id,
                     email: authData.user.email,
                     name: data.name,
@@ -153,6 +171,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     phone: data.phone,
                     created_at: new Date().toISOString(),
                 });
+
+                if (profileError) {
+                    console.error('Erro ao criar perfil:', profileError);
+                }
 
                 const userObj: User = {
                     id: authData.user.id,
@@ -167,6 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 else router.push('/client');
             }
         } catch (error) {
+            console.error('Signup error:', error);
             throw error;
         } finally {
             setIsLoading(false);
