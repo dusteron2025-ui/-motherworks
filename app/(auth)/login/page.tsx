@@ -6,8 +6,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import Link from "next/link";
-import { Heart, Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Heart, Loader2, Mail, Lock, Eye, EyeOff, Users, Sparkles } from "lucide-react";
+
+// Usuários de demonstração
+const DEMO_USERS = [
+    { id: 'demo-client', name: '👤 Cliente Demo', email: 'cliente.demo@teste.com', password: 'Teste123!', role: 'CLIENT' },
+    { id: 'demo-admin', name: '🔑 Admin Demo', email: 'admin.demo@teste.com', password: 'Teste123!', role: 'ADMIN' },
+    { id: 'separator', name: '── Provedoras de Alagoas ──', email: '', password: '', role: '' },
+    { id: 'maria', name: '👩 Maria Silva (Maceió)', email: 'maria.silva@teste.com', password: 'Teste123!', role: 'PROVIDER' },
+    { id: 'ana', name: '👩 Ana Paula (Maceió)', email: 'ana.oliveira@teste.com', password: 'Teste123!', role: 'PROVIDER' },
+    { id: 'juliana', name: '👩 Juliana Costa (Arapiraca)', email: 'juliana.costa@teste.com', password: 'Teste123!', role: 'PROVIDER' },
+    { id: 'fernanda', name: '👩 Fernanda Lima (Maceió)', email: 'fernanda.lima@teste.com', password: 'Teste123!', role: 'PROVIDER' },
+    { id: 'camila', name: '👩 Camila Rocha (Rio Largo)', email: 'camila.rocha@teste.com', password: 'Teste123!', role: 'PROVIDER' },
+    { id: 'beatriz', name: '👩 Beatriz Martins (Palmeira)', email: 'beatriz.martins@teste.com', password: 'Teste123!', role: 'PROVIDER' },
+    { id: 'larissa', name: '👩 Larissa Nascimento (Maceió)', email: 'larissa.nascimento@teste.com', password: 'Teste123!', role: 'PROVIDER' },
+    { id: 'patricia', name: '👩 Patricia Gomes (Penedo)', email: 'patricia.gomes@teste.com', password: 'Teste123!', role: 'PROVIDER' },
+    { id: 'amanda', name: '👩 Amanda Carvalho (Maceió)', email: 'amanda.carvalho@teste.com', password: 'Teste123!', role: 'PROVIDER' },
+    { id: 'gabriela', name: '👩 Gabriela Mendes (Marechal)', email: 'gabriela.mendes@teste.com', password: 'Teste123!', role: 'PROVIDER' },
+];
 
 export default function LoginPage() {
     const { login } = useAuth();
@@ -17,6 +41,8 @@ export default function LoginPage() {
     const [rememberMe, setRememberMe] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showDemoMode, setShowDemoMode] = useState(false);
+    const [selectedDemoUser, setSelectedDemoUser] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,6 +60,25 @@ export default function LoginPage() {
             } else {
                 setError(errorMessage);
             }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDemoLogin = async () => {
+        if (!selectedDemoUser) return;
+
+        const user = DEMO_USERS.find(u => u.id === selectedDemoUser);
+        if (!user || !user.email) return;
+
+        setIsLoading(true);
+        setError("");
+
+        try {
+            await login(user.email, user.password, false);
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Erro ao fazer login';
+            setError(`Erro no login demo: ${errorMessage}`);
         } finally {
             setIsLoading(false);
         }
@@ -57,6 +102,69 @@ export default function LoginPage() {
             {/* Bottom Section: White Sheet Form */}
             <div className="bg-white rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] p-8 pb-12 relative z-20 animate-in slide-in-from-bottom-10 duration-500">
                 <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-8"></div>
+
+                {/* Demo Mode Toggle */}
+                <div className="max-w-md mx-auto mb-6">
+                    <button
+                        type="button"
+                        onClick={() => setShowDemoMode(!showDemoMode)}
+                        className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-sm font-semibold transition-all ${showDemoMode
+                                ? 'bg-purple-100 text-purple-700 border-2 border-purple-300'
+                                : 'bg-slate-50 text-slate-600 border-2 border-transparent hover:bg-slate-100'
+                            }`}
+                    >
+                        <Sparkles className="w-4 h-4" />
+                        {showDemoMode ? 'Modo Demo Ativo' : 'Ativar Modo Demo'}
+                        <Users className="w-4 h-4" />
+                    </button>
+                </div>
+
+                {/* Demo Mode Panel */}
+                {showDemoMode && (
+                    <div className="max-w-md mx-auto mb-6 p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border-2 border-purple-100">
+                        <h3 className="text-sm font-bold text-purple-800 mb-3 flex items-center gap-2">
+                            <Sparkles className="w-4 h-4" />
+                            Selecione um usuário de demonstração
+                        </h3>
+                        <Select value={selectedDemoUser} onValueChange={setSelectedDemoUser}>
+                            <SelectTrigger className="w-full h-12 bg-white border-purple-200 rounded-xl">
+                                <SelectValue placeholder="Escolha um usuário..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {DEMO_USERS.map((user) => (
+                                    user.id === 'separator' ? (
+                                        <div key={user.id} className="px-2 py-1 text-xs font-bold text-slate-400 bg-slate-50">
+                                            {user.name}
+                                        </div>
+                                    ) : (
+                                        <SelectItem key={user.id} value={user.id}>
+                                            {user.name}
+                                        </SelectItem>
+                                    )
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Button
+                            type="button"
+                            onClick={handleDemoLogin}
+                            disabled={!selectedDemoUser || isLoading}
+                            className="w-full h-12 mt-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold shadow-lg shadow-purple-600/20"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Entrando...
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="mr-2 h-4 w-4" /> Entrar como Demo
+                                </>
+                            )}
+                        </Button>
+                        <p className="text-xs text-purple-600 text-center mt-2">
+                            Usuários criados para demonstração do sistema
+                        </p>
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto">
                     {/* Error Message */}
