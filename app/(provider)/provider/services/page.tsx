@@ -106,7 +106,7 @@ export default function ProviderServicesPage() {
             <div className="space-y-4">
                 <h2 className="text-lg font-bold text-slate-900">Serviços Disponíveis</h2>
 
-                {services.map((service) => {
+                {(services || []).map((service) => {
                     const IconComponent = iconMap[service.icon] || Sparkles;
                     const isEnabled = isServiceEnabled(service.id);
                     const price = getServicePrice(service.id, service.basePrice);

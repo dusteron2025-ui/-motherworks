@@ -202,7 +202,7 @@ export default function ProviderProfilePage() {
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-wrap gap-2">
-                                {provider.badges.map((badge) => (
+                                {(provider.badges || []).map((badge) => (
                                     <Badge key={badge} variant="secondary" className="bg-purple-50 text-purple-700 rounded-lg py-1 px-3">
                                         {badge}
                                     </Badge>
@@ -218,7 +218,7 @@ export default function ProviderProfilePage() {
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-wrap gap-2">
-                                {provider.skills.map((skill) => (
+                                {(provider.skills || []).map((skill) => (
                                     <Badge key={skill} variant="outline" className="border-slate-200 text-slate-600 rounded-lg">
                                         {skill}
                                     </Badge>

@@ -78,7 +78,7 @@ export default function ProviderDashboard() {
 
             {/* Stats Horizontal Scroll */}
             <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-                {stats.map((stat, i) => (
+                {stats?.map((stat, i) => (
                     <div key={i} className={`min-w-[160px] p-5 rounded-3xl shadow-sm flex flex-col justify-between h-40 ${stat.bg} ${stat.bg === 'bg-white' ? 'border border-slate-100' : 'shadow-lg shadow-purple-600/20'}`}>
                         <div className="flex justify-between items-start">
                             <div className={`p-2 rounded-xl ${stat.bg === 'bg-white' ? 'bg-slate-50' : 'bg-white/20'}`}>
@@ -118,7 +118,7 @@ export default function ProviderDashboard() {
                     </Card>
                 ) : (
                     <div className="space-y-3">
-                        {todaysJobs.map((job) => (
+                        {todaysJobs?.map((job) => (
                             <div key={job.id} className="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex gap-4 items-center">
                                 <div className="flex flex-col items-center justify-center bg-purple-50 w-16 h-16 rounded-2xl text-purple-700">
                                     <span className="text-sm font-bold">{job.timeSlot.split(':')[0]}</span>
