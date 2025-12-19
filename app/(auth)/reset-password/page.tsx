@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Lock, Eye, EyeOff, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 function ResetPasswordForm() {
     const router = useRouter();
     const [password, setPassword] = useState('');
@@ -108,7 +110,7 @@ function ResetPasswordForm() {
                             O link de recuperação expirou ou é inválido. Solicite um novo link.
                         </p>
                         <Button
-                            onClick={() => router.push('/auth/forgot-password')}
+                            onClick={() => router.push('/forgot-password')}
                             className="w-full rounded-xl bg-purple-600 hover:bg-purple-700"
                         >
                             Solicitar Novo Link

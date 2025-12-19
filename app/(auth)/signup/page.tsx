@@ -17,6 +17,8 @@ import {
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+export const dynamic = 'force-dynamic';
+
 type Step = 'role' | 'credentials' | 'phone' | 'otp' | 'address' | 'profile' | 'success';
 
 export default function SignupPage() {

@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Mail, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 export default function ForgotPasswordPage() {
     const router = useRouter();
     const [email, setEmail] = useState('');
