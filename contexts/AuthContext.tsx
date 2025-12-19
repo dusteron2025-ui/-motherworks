@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         id: session.user.id,
                         email: session.user.email || '',
                         name: profile?.name || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || '',
-                        role: (profile?.role as Role) || 'CLIENT',
+                        role: (profile?.role?.toUpperCase() as Role) || (session.user.user_metadata?.role?.toUpperCase() as Role) || 'CLIENT',
                         avatarUrl: profile?.avatar_url || session.user.user_metadata?.avatar_url,
                         createdAt: profile?.created_at || session.user.created_at,
                     };
@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     id: session.user.id,
                     email: session.user.email || '',
                     name: profile?.name || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || '',
-                    role: (profile?.role as Role) || 'CLIENT',
+                    role: (profile?.role?.toUpperCase() as Role) || (session.user.user_metadata?.role?.toUpperCase() as Role) || 'CLIENT',
                     avatarUrl: profile?.avatar_url || session.user.user_metadata?.avatar_url,
                     createdAt: profile?.created_at || session.user.created_at,
                 };
@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     id: data.user.id,
                     email: data.user.email || '',
                     name: profile?.name || data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || '',
-                    role: (profile?.role as Role) || 'CLIENT',
+                    role: (profile?.role?.toUpperCase() as Role) || (data.user.user_metadata?.role?.toUpperCase() as Role) || 'CLIENT',
                     avatarUrl: profile?.avatar_url,
                     createdAt: profile?.created_at || data.user.created_at,
                 };
